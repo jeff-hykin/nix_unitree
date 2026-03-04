@@ -1,0 +1,116 @@
+{
+  "nodes": {
+    "flake-utils": {
+      "inputs": {
+        "systems": "systems"
+      },
+      "locked": {
+        "lastModified": 1731533236,
+        "narHash": "sha256-l0KFg5HjrsfsO/JpG+r7fRrqm12kzFHyUHqHCVpMMbI=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "11707dc2f618dd54ca8739b309ec4fc024de578b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
+    "lib": {
+      "inputs": {
+        "flakeUtils": [
+          "flake-utils"
+        ],
+        "libSource": "libSource"
+      },
+      "locked": {
+        "lastModified": 1768416447,
+        "narHash": "sha256-S0n9qoPXg4P1VxOu5ayiuxk7nJk1kk6FlVevU4y9v5o=",
+        "owner": "jeff-hykin",
+        "repo": "quick-nix-toolkits",
+        "rev": "dfad23538da813bc0eb5148644af9227e04191f0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "jeff-hykin",
+        "repo": "quick-nix-toolkits",
+        "type": "github"
+      }
+    },
+    "libSource": {
+      "locked": {
+        "lastModified": 1772328832,
+        "narHash": "sha256-e+/T/pmEkLP6BHhYjx6GmwP5ivonQQn0bJdH9YrRB+Q=",
+        "owner": "nix-community",
+        "repo": "nixpkgs.lib",
+        "rev": "c185c7a5e5dd8f9add5b2f8ebeff00888b070742",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "nixpkgs.lib",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1772542754,
+        "narHash": "sha256-WGV2hy+VIeQsYXpsLjdr4GvHv5eECMISX1zKLTedhdg=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "8c809a146a140c5c8806f13399592dbcb1bb5dc4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "flake-utils": "flake-utils",
+        "lib": "lib",
+        "nixpkgs": "nixpkgs",
+        "unitree_sdk2_src": "unitree_sdk2_src"
+      }
+    },
+    "systems": {
+      "locked": {
+        "lastModified": 1681028828,
+        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
+        "owner": "nix-systems",
+        "repo": "default",
+        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-systems",
+        "repo": "default",
+        "type": "github"
+      }
+    },
+    "unitree_sdk2_src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1751874269,
+        "narHash": "sha256-a+O3jQDJFq/v0zhpGJVuwjgWAZWkIqiNfKt/L4IOSco=",
+        "owner": "unitreerobotics",
+        "repo": "unitree_sdk2",
+        "rev": "811bc77cdcffb4691d4b40172f9a57857bf6cffb",
+        "type": "github"
+      },
+      "original": {
+        "owner": "unitreerobotics",
+        "ref": "2.0.2",
+        "repo": "unitree_sdk2",
+        "type": "github"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}
