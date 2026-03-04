@@ -102,10 +102,10 @@
             "-DBUILD_EXAMPLES=OFF"
           ];
 
-          meta = with pkgs.lib; {
+          meta = {
             description = "Unitree SDK2 for robot control via DDS";
             homepage    = "https://github.com/unitreerobotics/unitree_sdk2";
-            license     = licenses.bsd3;
+            license     = pkgs.lib.licenses.bsd3;
             platforms   = [ "x86_64-linux" "aarch64-linux" ];
           };
         };
