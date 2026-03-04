@@ -1,0 +1,100 @@
+#!/usr/bin/env -S deno run --allow-net --allow-read --allow-write --allow-run
+
+// find latest unitree_sdk2 version, update flake.nix, run flake update, tag, commit, push
+
+const repoRoot = new URL("..", import.meta.url).pathname.replace(/\/$/, "")
+
+async function run(cmd, args, opts = {}) {
+    const proc = new Deno.Command(cmd, { args, cwd: repoRoot, stdout: "piped", stderr: "piped", ...opts })
+    const result = await proc.output()
+    const stdout = new TextDecoder().decode(result.stdout).trim()
+    const stderr = new TextDecoder().decode(result.stderr).trim()
+    if (!result.success) {
+        throw new Error(`Command failed: ${cmd} ${args.join(" ")}\n${stderr}`)
+    }
+    return stdout
+}
+
+// 1. fetch latest release tag from GitHub API
+console.log("Fetching latest unitree_sdk2 release...")
+const response = await fetch("https://api.github.com/repos/unitreerobotics/unitree_sdk2/tags?per_page=100")
+if (!response.ok) {
+    throw new Error(`GitHub API error: ${response.status} ${response.statusText}`)
+}
+const tags = await response.json()
+
+// find the highest semver-looking tag
+const semverTags = tags
+    .map(t => t.name)
+    .filter(name => /^\d+\.\d+\.\d+$/.test(name))
+    .sort((a, b) => {
+        const pa = a.split(".").map(Number)
+        const pb = b.split(".").map(Number)
+        for (let i = 0; i < 3; i++) {
+            if (pa[i] !== pb[i]) return pb[i] - pa[i]
+        }
+        return 0
+    })
+
+if (semverTags.length === 0) {
+    throw new Error("No semver tags found in unitreerobotics/unitree_sdk2")
+}
+
+const latestVersion = semverTags[0]
+console.log(`Latest version: ${latestVersion}`)
+
+// 2. read current flake.nix and find current version
+const flakePath = `${repoRoot}/flake.nix`
+const flakeContent = await Deno.readTextFile(flakePath)
+
+const currentUrlMatch = flakeContent.match(/github:unitreerobotics\/unitree_sdk2\/([\d.]+)/)
+const currentVersionMatch = flakeContent.match(/version\s*=\s*"([\d.]+)"/)
+
+if (!currentUrlMatch || !currentVersionMatch) {
+    throw new Error("Could not find current version in flake.nix")
+}
+
+const currentVersion = currentUrlMatch[1]
+console.log(`Current version: ${currentVersion}`)
+
+if (currentVersion === latestVersion) {
+    console.log("Already up to date.")
+    Deno.exit(0)
+}
+
+// 3. update flake.nix: replace version in both the input URL and the derivation
+console.log(`Updating flake.nix: ${currentVersion} -> ${latestVersion}`)
+const updatedContent = flakeContent
+    .replaceAll(
+        `github:unitreerobotics/unitree_sdk2/${currentVersion}`,
+        `github:unitreerobotics/unitree_sdk2/${latestVersion}`,
+    )
+    .replaceAll(
+        `version = "${currentVersion}"`,
+        `version = "${latestVersion}"`,
+    )
+
+await Deno.writeTextFile(flakePath, updatedContent)
+
+// 4. run nix flake update to refresh the lock file
+console.log("Running nix flake update...")
+const flakeUpdateOutput = await run("nix", ["flake", "update"])
+if (flakeUpdateOutput) console.log(flakeUpdateOutput)
+
+// 5. stage, commit, tag, push
+const tag = `v${latestVersion}`
+
+console.log("Staging changes...")
+await run("git", ["add", "flake.nix", "flake.lock"])
+
+console.log(`Committing: update unitree_sdk2 to ${latestVersion}`)
+await run("git", ["commit", "-m", `update unitree_sdk2 to ${latestVersion}`])
+
+console.log(`Creating tag: ${tag}`)
+await run("git", ["tag", tag])
+
+console.log("Pushing commit and tag...")
+await run("git", ["push"])
+await run("git", ["push", "origin", tag])
+
+console.log(`Done! Updated to ${latestVersion} and pushed tag ${tag}`)
